@@ -19,28 +19,32 @@ import java.io.IOException;
 import javax.swing.Timer;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-public class Board extends JPanel implements DEFAULTS{
+public class GamePlay extends JPanel implements DEFAULTS{
     
     private Brick[] Bricks;
     private Paddle paddle;
     private Ball ball;
     private Timer timer;
     private Difficulty difficulty;
-    private Sound Hit, Win, Lost;
+    private Sound GameSounds;
+    private Menu menu;
     private int Score;
     private boolean Running = true;
     private String message = "You won!";
 
     // Set width and height for game window
-    Board(Difficulty difficulty, int rows){
+    GamePlay(Difficulty difficulty, int rows, Menu menu){
         this.difficulty = difficulty;
+        this.menu = menu;
+
         Bricks = new Brick[difficulty.getBricks()];
         Brick.setBricks(Bricks, rows);
         paddle = new Paddle(difficulty);
         ball = new Ball(difficulty);
-        Hit = new Sound();
+        GameSounds = new Sound();
         Score = 0;
         addKeyListener(paddle);   // Paddle class set to handle key inputs
         setFocusable(true);
@@ -49,7 +53,6 @@ public class Board extends JPanel implements DEFAULTS{
         timer = new Timer(10, new Game());
         timer.start();
 
-        //Game g = new Game(); // Starts game
     }
 
     private class Game implements ActionListener{
@@ -61,8 +64,13 @@ public class Board extends JPanel implements DEFAULTS{
     }
 
     private void updateGame(){
-        ball.move();
-        paddle.move();
+        try{
+            ball.move(GameSounds);
+            paddle.move(GameSounds);
+        }catch(UnsupportedAudioFileException | IOException | LineUnavailableException e){
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         StatusCheck();
         repaint();
     }
@@ -70,6 +78,13 @@ public class Board extends JPanel implements DEFAULTS{
     private void StatusCheck(){
         // If the ball reaches the bottom of the board, end game
         if(ball.getBall().getMaxY() >= BOARD_HEIGHT){
+            try {
+                GameSounds.GAME_OVER_sound(YOU_LOSE_SOUND);
+                // TODO: DISPLAY RETURN TO MENNU BUTTON
+            } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
             message = "Game Over! You Lost!";
             Running = false;
             timer.stop();
@@ -84,6 +99,12 @@ public class Board extends JPanel implements DEFAULTS{
             }
         }
         if(empty){
+            try {
+                GameSounds.GAME_OVER_sound(YOU_WIN_SOUND);
+            } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
             Running = false;
             timer.stop();
         }
@@ -91,7 +112,7 @@ public class Board extends JPanel implements DEFAULTS{
         // Check if the ball has collided with the paddle for ball to ricochet approprietly
         if(ball.getBall().intersects(paddle.getPaddle())){
             try {
-                Hit.PLAY(BALL_PADDLE_SOUND);
+                GameSounds.HIT_sound(BALL_PADDLE_SOUND);
             } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -116,7 +137,7 @@ public class Board extends JPanel implements DEFAULTS{
                 if(!Bricks[i].checkStatus()){
                     Score++;
                     try {
-                        Hit.PLAY(BALL_BRICK_SOUND);
+                        GameSounds.HIT_sound(BALL_BRICK_SOUND);
                     } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
@@ -191,12 +212,14 @@ public class Board extends JPanel implements DEFAULTS{
     }
 
     private void GameOver(Graphics2D g2){
-        var font = new Font("Verdana", Font.BOLD, 30);
+        Font font = new Font("Verdana", Font.BOLD, 30);
         FontMetrics fontMetrics = this.getFontMetrics(font);
 
         g2.setColor(Color.BLACK);
         g2.setFont(font);
         g2.drawString(message,
                 (DEFAULTS.BOARD_WIDTH - fontMetrics.stringWidth(message)) / 2, BOARD_HEIGHT / 2);
+        
+        menu.ReturnToMenu(new JFrame());
     }
 }

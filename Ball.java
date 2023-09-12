@@ -6,6 +6,10 @@
  */
 
 import java.awt.Rectangle;
+import java.io.IOException;
+
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class Ball implements DEFAULTS{
     private int WIDTH, HEIGHT, xPos, yPos, MoveX, MoveY;
@@ -22,7 +26,7 @@ public class Ball implements DEFAULTS{
         yPos = BOARD_HEIGHT / 2;
     }
 
-    public void move(){
+    public void move(Sound GameSounds) throws UnsupportedAudioFileException, IOException, LineUnavailableException{
         // Update position of ball
         xPos += MoveX;
         yPos += MoveY;
@@ -30,12 +34,15 @@ public class Ball implements DEFAULTS{
         // Check if paddle exceeds borders
         if(xPos <= 0 ){
             MoveX = difficulty.getBallSpeed();
+            GameSounds.HIT_sound(BALL_BORDER_SOUND);
         }
         if(xPos >= BOARD_WIDTH - WIDTH){
             MoveX = -(difficulty.getBallSpeed());
+            GameSounds.HIT_sound(BALL_BORDER_SOUND);
         }
         if(yPos <= 0){
             MoveY = difficulty.getBallSpeed();
+            GameSounds.HIT_sound(BALL_BORDER_SOUND);
         }
     }
     public Rectangle getBall(){

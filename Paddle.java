@@ -6,6 +6,11 @@
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
+
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
+
 import java.awt.Rectangle;
 
 public class Paddle extends KeyAdapter implements DEFAULTS{
@@ -21,16 +26,18 @@ public class Paddle extends KeyAdapter implements DEFAULTS{
         Move = 0;   // Amount paddle will move
     }
 
-    public void move(){
+    public void move(Sound GameSounds) throws UnsupportedAudioFileException, IOException, LineUnavailableException{
         // Update position of paddle
         xPos += Move;
 
         // Check if paddle exceeds borders
         if(xPos <= 0 ){
             xPos = 0;
+            //GameSounds.HIT_sound(BALL_BORDER_SOUND);
         }
         if(xPos >= BOARD_WIDTH - WIDTH){
             xPos = BOARD_WIDTH - WIDTH;
+            //GameSounds.HIT_sound(BALL_BORDER_SOUND);
         }
         
     }
