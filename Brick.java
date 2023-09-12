@@ -6,41 +6,34 @@
 
 import java.awt.Rectangle;
 
-public class Brick {
+public class Brick implements DEFAULTS{
     
-    private boolean Status;
+    private boolean Destroyed;
     private int x, y;
-    private static int width, height;
     
     Brick(int x, int y){
         this.x = x;
         this.y = y;
-        Status = true;  // Represents not being destroyed
+        Destroyed = false;  // Represents not being destroyed
     }
 
-    public static void setBricks(Brick[] Bricks){
-        Bricks = new Brick[User.NUM_BRICKS];
+    public static void setBricks(Brick[] Bricks, int ROWS){
 
-        // Allows space to be around bricks and adjust to the set frame size
-        int space = BrickBreaker.FRAME_WIDTH / BrickBreaker.FRAME_HEIGHT;
-        // Brick sizes given based on frame width / number of columns, frame height / number of columns*2 (only want bricks in the first half of frame)
-        int xPos = BrickBreaker.FRAME_WIDTH / BrickBreaker.getColumns(), yPos = BrickBreaker.FRAME_HEIGHT / (BrickBreaker.getColumns()*2);   
-        
-        width = xPos;
-        height = yPos;
-
-        for(int i = 1; i <= User.NUM_BRICKS; i++){
+        for(int i = 0; i < Bricks.length; i++){
             // Each brick will be offsetted by a factor based on the Frames height and width at the given time
-            Bricks[i-1] = new Brick(xPos*(i%12) + space, yPos*(i/12) + space);
+            Bricks[i] = new Brick((BRICK_WIDTH*(i%COLUMNS)) + BRICK_WIDTH, (BRICK_HEIGHT*(i/COLUMNS)) + BRICK_HEIGHT);  // Add brick widht/height for space between bricks and borders
             /*
-             * i%12 = Multiplies the xPos by a factor of [1,11]
-             * i/12 = Multiplies the yPos by a factor of [1,3]
+             * i%12 = Multiplies the x position by a factor of [0,11]
+             * i/12 = Multiplies the y position by a factor of [0,2]
              */
         }
     }
 
     public boolean checkStatus(){
-        return this.Status;
+        return this.Destroyed;
+    }
+    public void setStatus(){
+        this.Destroyed = true;
     }
     public int getX(){
         return this.x;
@@ -50,6 +43,6 @@ public class Brick {
     }
 
     public Rectangle getRectangle(){
-        return new Rectangle(x, y, width, height);
+        return new Rectangle(x, y, BRICK_WIDTH, BRICK_HEIGHT);
     }
 }

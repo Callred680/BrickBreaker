@@ -6,15 +6,18 @@
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.geom.RoundRectangle2D;
+import java.awt.Rectangle;
 
-public class Paddle extends KeyAdapter{
-    private int WIDTH, HEIGHT, xPos, Move;
+public class Paddle extends KeyAdapter implements DEFAULTS{
+    private int WIDTH, HEIGHT, xPos, yPos, Move;
+    private Difficulty difficulty;
 
-    Paddle(int WIDTH, int HEIGHT, int xPos, int yPos){
-        this.WIDTH = HEIGHT/(WIDTH/2);  // Width of the paddle
-        this.HEIGHT = HEIGHT/(WIDTH/4); // Height (thickness) of the paddle
-        this.xPos = xPos;   // Current position of the paddle
+    Paddle(Difficulty difficulty){
+        this.difficulty = difficulty;
+        this.WIDTH = PADDLE_WIDTH;  // Width of the paddle
+        this.HEIGHT = PADDLE_HEIGHT; // Height (thickness) of the paddle
+        this.xPos = (BOARD_WIDTH/2) - (PADDLE_WIDTH/2);   // Start position of the paddle
+        this.yPos = BOARD_HEIGHT - PADDLE_HEIGHT;;   // Y position which won't change
         Move = 0;   // Amount paddle will move
     }
 
@@ -26,24 +29,39 @@ public class Paddle extends KeyAdapter{
         if(xPos <= 0 ){
             xPos = 0;
         }
-        if(xPos >= User.BOARD_WIDTH - WIDTH){
-            xPos = User.BOARD_WIDTH - WIDTH;
+        if(xPos >= BOARD_WIDTH - WIDTH){
+            xPos = BOARD_WIDTH - WIDTH;
         }
         
     }
 
+    //Return the left and right sides for the paddle
     public int getLeft(){
         return this.xPos;
     }
     public int getRight(){
         return this.xPos + this.WIDTH;
     }
-    public int getWidth(){
+
+    // Return set width for paddle
+    public int getWIDTH(){
         return this.WIDTH;
     }
+    public int getHEIGHT(){
+        return this.HEIGHT;
+    }
+    public int getXPos(){
+        return this.xPos;
+    }
+    public int getYPos(){
+        return this.yPos;
+    }
+    public int getMove(){
+        return Move;
+    }
 
-    public RoundRectangle2D getPaddle(){
-        return new RoundRectangle2D.Double(50.0, 50.0, HEIGHT, WIDTH, xPos, User.BOARD_HEIGHT-(HEIGHT/2));
+    public Rectangle getPaddle(){
+        return new Rectangle(xPos, yPos, WIDTH, HEIGHT);
     }
 
     @Override
@@ -61,10 +79,10 @@ public class Paddle extends KeyAdapter{
     public void keyPressed(KeyEvent e){
         int key = e.getKeyCode();
         if(key == KeyEvent.VK_LEFT){
-            Move = -1;
+            Move = -(difficulty.getPaddleSpeed());
         }
         if(key == KeyEvent.VK_RIGHT){
-            Move = 1;
+            Move = difficulty.getPaddleSpeed();
         }
     }
 }

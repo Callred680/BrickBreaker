@@ -5,42 +5,61 @@
  * 
  */
 
-import java.awt.geom.RoundRectangle2D;
+import java.awt.Rectangle;
 
-public class Ball{
-    private int WIDTH, HEIGHT, xPos, yPos;
-    public int MoveX, MoveY;
+public class Ball implements DEFAULTS{
+    private int WIDTH, HEIGHT, xPos, yPos, MoveX, MoveY;
+    private Difficulty difficulty;
 
     // Start ball initially falling at an angle, otherwise it will just bounce vertically
-    Ball(int WIDTH, int HEIGHT){
-        MoveX = 1;
-        MoveY = -1;
-        this.WIDTH = WIDTH/User.NUM_BRICKS;
-        this.HEIGHT = HEIGHT/User.NUM_BRICKS; 
+    Ball(Difficulty difficulty){
+        this.difficulty = difficulty;
+        MoveX = difficulty.getBallSpeed();
+        MoveY = -(difficulty.getBallSpeed());
+        this.WIDTH = BALL_WIDTH;
+        this.HEIGHT = BALL_HEIGHT; 
+        xPos = BOARD_WIDTH / 2;
+        yPos = BOARD_HEIGHT / 2;
     }
 
     public void move(){
         // Update position of ball
         xPos += MoveX;
         yPos += MoveY;
+
         // Check if paddle exceeds borders
         if(xPos <= 0 ){
-            MoveX = 1;
+            MoveX = difficulty.getBallSpeed();
         }
-        if(xPos >= User.BOARD_WIDTH - WIDTH){
-            MoveX = -1;
+        if(xPos >= BOARD_WIDTH - WIDTH){
+            MoveX = -(difficulty.getBallSpeed());
         }
         if(yPos <= 0){
-            MoveY = 1;
+            MoveY = difficulty.getBallSpeed();
         }
+    }
+    public Rectangle getBall(){
+        return new Rectangle(xPos, yPos, WIDTH, HEIGHT);
     }
 
     // Returns center of ball for use in collision detection/response
-    public int getX(){
-        return this.xPos - ((this.WIDTH - this.xPos) / 2);
+    public int getXPos(){
+        return this.xPos;
+    }
+    public int getYPos(){
+        return this.yPos;
+    }
+    public int getWIDTH(){
+        return WIDTH;
+    }
+    public int getHEIGHT(){
+        return HEIGHT;
     }
 
-    public RoundRectangle2D getBall(){
-        return new RoundRectangle2D.Double(50.0, 50.0, HEIGHT, WIDTH, xPos, yPos);
+    public void setMoveX(int MoveX){
+        this.MoveX = MoveX;
+    }
+    public void setMoveY(int MoveY){
+        this.MoveY = MoveY;
     }
 }
