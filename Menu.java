@@ -19,10 +19,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class Menu extends JFrame implements DEFAULTS {
-    private static JPanel Components = new JPanel();
+    private static JPanel Components;
     private BrickBreaker BB;
+    private LeaderBoard LB;
 
     Menu(){
+        Components = new JPanel();
+        
         // Set up layouts for panel and frame
         setLayout(new GridBagLayout());
         Components.setLayout(new BoxLayout(Components, BoxLayout.Y_AXIS));
@@ -109,7 +112,14 @@ public class Menu extends JFrame implements DEFAULTS {
     ActionListener SeeScores = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e){
-            JOptionPane.showMessageDialog(new JFrame(), "Sorry, this feature as not be implemented as of right now. It is still currently being developed. Thanks for your understanding!", "FEATURE NOT IMPLEMENTED YET", JOptionPane.ERROR_MESSAGE);
+            if(LB != null){
+                // Remove old frame if user decides to play again
+                LB.setVisible(false);
+                LB.dispose();
+            }
+            // Display dialog box for user to select difficulty level
+            LB = new LeaderBoard();
+            LB.setVisible(true);
         }
     };
 }

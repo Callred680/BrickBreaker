@@ -4,6 +4,8 @@
  * 
  */
 
+import java.awt.EventQueue;
+
 import javax.swing.JFrame;  // Creates window for JPanel to put on and other GUI components
 
 public class BrickBreaker extends JFrame implements DEFAULTS{   // Extension of base class since nothing new is added/changed method wise
@@ -27,8 +29,10 @@ public class BrickBreaker extends JFrame implements DEFAULTS{   // Extension of 
     }
 
     public static void main(String[] args){
-        menu = new Menu();
-        menu.setVisible(true);
+        EventQueue.invokeLater(() -> {
+            menu = new Menu();
+            menu.setVisible(true);
+        });
     }
     
     public static int getRows(){

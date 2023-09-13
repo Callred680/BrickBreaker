@@ -14,7 +14,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import java.awt.Rectangle;
 
 public class Paddle extends KeyAdapter implements DEFAULTS{
-    private int WIDTH, HEIGHT, xPos, yPos, Move;
+    private int WIDTH, HEIGHT, xPos, yPos, MoveX;
     private Difficulty difficulty;
 
     Paddle(Difficulty difficulty){
@@ -23,12 +23,12 @@ public class Paddle extends KeyAdapter implements DEFAULTS{
         this.HEIGHT = PADDLE_HEIGHT; // Height (thickness) of the paddle
         this.xPos = (BOARD_WIDTH/2) - (PADDLE_WIDTH/2);   // Start position of the paddle
         this.yPos = BOARD_HEIGHT - PADDLE_HEIGHT;;   // Y position which won't change
-        Move = 0;   // Amount paddle will move
+        MoveX = 0;   // Amount paddle will move
     }
 
     public void move(Sound GameSounds) throws UnsupportedAudioFileException, IOException, LineUnavailableException{
         // Update position of paddle
-        xPos += Move;
+        xPos += MoveX;
 
         // Check if paddle exceeds borders
         if(xPos <= 0 ){
@@ -42,7 +42,12 @@ public class Paddle extends KeyAdapter implements DEFAULTS{
         
     }
 
-    //Return the left and right sides for the paddle
+    // Returns ball as object to be drawn
+    public Rectangle getPaddle(){
+        return new Rectangle(xPos, yPos, WIDTH, HEIGHT);
+    }
+    
+    // Return the left and right sides for the paddle
     public int getLeft(){
         return this.xPos;
     }
@@ -63,22 +68,18 @@ public class Paddle extends KeyAdapter implements DEFAULTS{
     public int getYPos(){
         return this.yPos;
     }
-    public int getMove(){
-        return Move;
-    }
-
-    public Rectangle getPaddle(){
-        return new Rectangle(xPos, yPos, WIDTH, HEIGHT);
+    public int getMoveX(){
+        return MoveX;
     }
 
     @Override
     public void keyReleased(KeyEvent e){
         int key = e.getKeyCode();
         if(key == KeyEvent.VK_LEFT){
-            Move = 0;
+            MoveX = 0;
         }
         if(key == KeyEvent.VK_RIGHT){
-            Move = 0;
+            MoveX = 0;
         }
     }
     
@@ -86,10 +87,10 @@ public class Paddle extends KeyAdapter implements DEFAULTS{
     public void keyPressed(KeyEvent e){
         int key = e.getKeyCode();
         if(key == KeyEvent.VK_LEFT){
-            Move = -(difficulty.getPaddleSpeed());
+            MoveX = -(difficulty.getPaddleSpeed());
         }
         if(key == KeyEvent.VK_RIGHT){
-            Move = difficulty.getPaddleSpeed();
+            MoveX = difficulty.getPaddleSpeed();
         }
     }
 }

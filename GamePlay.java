@@ -11,10 +11,13 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.Timer;
 import javax.sound.sampled.LineUnavailableException;
@@ -24,24 +27,28 @@ import javax.swing.JPanel;
 
 public class GamePlay extends JPanel implements DEFAULTS{
     
-    private Brick[] Bricks;
-    private Paddle paddle;
-    private Ball ball;
-    private Timer timer;
-    private Difficulty difficulty;
-    private Sound GameSounds;
-    private Menu menu;
-    private int Score;
+    // Must be ConcurrentHashMap as objects will be remove and checked concurrently
+    private Set<Brick> Bricks;  // Create set with thread-safe hash map by changing key set once initialized
+
+    // private Brick[] Bricks;
+    private static Paddle paddle;
+    private static Ball ball;
+    private static Timer timer;
+    private static Difficulty difficulty;
+    private static Sound GameSounds;
+    private static Menu menu;
+    private static int Score;
     private boolean Running = true;
     private String message = "You won!";
 
     // Set width and height for game window
-    GamePlay(Difficulty difficulty, int rows, Menu menu){
-        this.difficulty = difficulty;
-        this.menu = menu;
+    GamePlay(Difficulty diff, int rows, Menu m){
+        difficulty = diff;
+        menu = m;
+        Bricks = ConcurrentHashMap.newKeySet(difficulty.getBricks()+1); // Allows thread-safe operations (removing while checking hash set)
 
-        Bricks = new Brick[difficulty.getBricks()];
-        Brick.setBricks(Bricks, rows);
+        // Create hash set with capacity set to max brick count and load factor of 1 to avoid wasted time
+        Brick.setBricks(Bricks, rows, difficulty.getBricks());
         paddle = new Paddle(difficulty);
         ball = new Ball(difficulty);
         GameSounds = new Sound();
@@ -50,7 +57,7 @@ public class GamePlay extends JPanel implements DEFAULTS{
         setFocusable(true);
         setPreferredSize(new Dimension(BOARD_WIDTH, BOARD_HEIGHT));   // Set JPanel to that of the JFrame size accordingly
 
-        timer = new Timer(0, new Game());
+        timer = new Timer(10, new Game());
         timer.start();
     }
 
@@ -98,15 +105,9 @@ public class GamePlay extends JPanel implements DEFAULTS{
             timer.stop();
         }
 
-        // Check status of each brick
-        boolean empty = true;
-        for(int i = 0; i < Bricks.length; i++){
-            if(!Bricks[i].checkStatus()){
-                empty = false;
-                break;
-            }
-        }
-        if(empty){
+        // Check if every brick has been destroyed
+
+        if(Bricks.isEmpty()){
             try {
                 GameSounds.GAME_OVER_sound(YOU_WIN_SOUND);
             } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
@@ -125,47 +126,43 @@ public class GamePlay extends JPanel implements DEFAULTS{
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            int p = (int) paddle.getPaddle().getMinX();
-            int b = (int) ball.getBall().getMinX();
 
-            if(b < p+(paddle.getWIDTH()/3)){
-                ball.setMoveX(-(difficulty.getBallSpeed()));
-                ball.setMoveY(-(difficulty.getBallSpeed()));
-            }else if(b >= p+(paddle.getWIDTH()/3) && b < p+((2*paddle.getWIDTH())/3)){
-                ball.setMoveX(0);
-                ball.setMoveY(-(difficulty.getBallSpeed()));
-            }else{
+            // Set ball to bouce off paddle based on current direction of JUST the paddle
+            if(paddle.getMoveX() < 0){   
+                ball.setMoveX(-difficulty.getBallSpeed());
+            }else if( paddle.getMoveX() > 0){
                 ball.setMoveX(difficulty.getBallSpeed());
-                ball.setMoveY(-(difficulty.getBallSpeed()));
             }
+            // Set ball to bounce off paddle vertically no matter what direction it is moving in
+            ball.setMoveY(-difficulty.getBallSpeed());
         }
-
-        for(int i = 0; i < Bricks.length; i++){
-            if(ball.getBall().intersects(Bricks[i].getRectangle())){
-                if(!Bricks[i].checkStatus()){
-                    Score++;
-                    try {
-                        GameSounds.HIT_sound(BALL_BRICK_SOUND);
-                    } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                    if(Bricks[i].getRectangle().contains(ball.getXPos()-1, ball.getYPos())){
-                        ball.setMoveX(difficulty.getBallSpeed());
-                    }else if(Bricks[i].getRectangle().contains(ball.getXPos()+ball.getWIDTH()+1, ball.getYPos())){
-                        ball.setMoveX(-difficulty.getBallSpeed());
-                    }
-
-                    if(Bricks[i].getRectangle().contains(ball.getXPos(), ball.getYPos()-1)){
-                        ball.setMoveY(difficulty.getBallSpeed());
-                    }else if(Bricks[i].getRectangle().contains(ball.getXPos(), ball.getYPos()+ball.getHEIGHT()+1)){
-                        ball.setMoveY(-difficulty.getBallSpeed());
-                    }
+        
+        // Check if ball is anywhere in brick area
+        for(Brick b : Bricks){
+            if(ball.getBall().intersects(b.getRectangle())){
+                Score++;
+                try {
+                    GameSounds.HIT_sound(BALL_BRICK_SOUND);
+                } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
-                Bricks[i].setStatus();
+                if(b.getRectangle().contains(ball.getXPos()-1, ball.getYPos())){
+                    ball.setMoveX(difficulty.getBallSpeed());
+                }else if(b.getRectangle().contains(ball.getXPos()+ball.getWIDTH()+1, ball.getYPos())){
+                    ball.setMoveX(-difficulty.getBallSpeed());
+                }
+                if(b.getRectangle().contains(ball.getXPos(), ball.getYPos()-1)){
+                    ball.setMoveY(difficulty.getBallSpeed());
+                }else if(b.getRectangle().contains(ball.getXPos(), ball.getYPos()+ball.getHEIGHT()+1)){
+                    ball.setMoveY(-difficulty.getBallSpeed());
+                }
+                
+                // Remove brick from HashSet to avoid being drawn again
+                Bricks.remove(b);
+                break;  // Assume only one brick can be hit at a time before checking again
             }
         }
-
     }
 
     @Override
@@ -174,6 +171,11 @@ public class GamePlay extends JPanel implements DEFAULTS{
 
         Graphics2D g2 = (Graphics2D) g;
         
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_SPEED);
+        g2.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_SPEED);
+        g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
+
         if(Running){
             drawComponents(g2);
         }else{
@@ -197,15 +199,13 @@ public class GamePlay extends JPanel implements DEFAULTS{
         g2.drawRoundRect(paddle.getXPos(), paddle.getYPos(), paddle.getWIDTH(), paddle.getHEIGHT(), 10, 10);
 
         // Draw bricks not yet destroyed
-        for(int i = 0; i < Bricks.length; i++){
-            if(!Bricks[i].checkStatus()){
-                // Set color of bricks to users selection before drawing
-                g2.setColor(BRICK_COLOR);
-                g2.fillRect(Bricks[i].getX(), Bricks[i].getY(), BRICK_WIDTH, BRICK_HEIGHT);
+        for(Brick b : Bricks){
+            // Set color of bricks to users selection before drawing
+            g2.setColor(BRICK_COLOR);
+            g2.fillRect(b.getX(), b.getY(), BRICK_WIDTH, BRICK_HEIGHT);
 
-                g2.setColor(TEXT_COLOR);
-                g2.drawRect(Bricks[i].getX(), Bricks[i].getY(), BRICK_WIDTH, BRICK_HEIGHT);
-            }
+            g2.setColor(TEXT_COLOR);
+            g2.drawRect(b.getX(), b.getY(), BRICK_WIDTH, BRICK_HEIGHT);
         }
 
         // Update score

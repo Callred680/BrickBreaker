@@ -45,6 +45,8 @@ public class Ball implements DEFAULTS{
             GameSounds.HIT_sound(BALL_BORDER_SOUND);
         }
     }
+    
+    // Returns ball as object to be drawn
     public Rectangle getBall(){
         return new Rectangle(xPos, yPos, WIDTH, HEIGHT);
     }
@@ -61,6 +63,12 @@ public class Ball implements DEFAULTS{
     }
     public int getHEIGHT(){
         return HEIGHT;
+    }
+    public int getMoveX(){
+        return MoveX;
+    }
+    public int getMoveY(){
+        return MoveY;
     }
 
     public void setMoveX(int MoveX){

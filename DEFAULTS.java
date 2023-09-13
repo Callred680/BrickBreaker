@@ -49,7 +49,9 @@ public interface DEFAULTS {
     static int BOARD_WIDTH = 500, 
                BOARD_HEIGHT = 600,
                MENU_HEIGHT = 400,
-               MENU_WIDTH = 400;
+               MENU_WIDTH = 400,
+               LEADERBOARD_HEIGHT = 800,
+               LEADERBOARD_WIDTH = 400;
 
     // Default variables for setting up and running brick breaker game
     static int COLUMNS = 12,
