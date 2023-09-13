@@ -19,7 +19,7 @@ import java.io.IOException;
 import javax.swing.Timer;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class GamePlay extends JPanel implements DEFAULTS{
@@ -50,9 +50,8 @@ public class GamePlay extends JPanel implements DEFAULTS{
         setFocusable(true);
         setPreferredSize(new Dimension(BOARD_WIDTH, BOARD_HEIGHT));   // Set JPanel to that of the JFrame size accordingly
 
-        timer = new Timer(10, new Game());
+        timer = new Timer(0, new Game());
         timer.start();
-
     }
 
     private class Game implements ActionListener{
@@ -73,6 +72,16 @@ public class GamePlay extends JPanel implements DEFAULTS{
         }
         StatusCheck();
         repaint();
+        if(!Running){
+            int UserChoice = JOptionPane.showConfirmDialog(null, "Return to Menu?", "", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null);
+            if(UserChoice == 0){
+                this.setVisible(false);
+                menu.setVisible(true);
+            }else{
+                // End program if user selects to not return to menu
+                System.exit(0);
+            }
+        }
     }
 
     private void StatusCheck(){
@@ -80,7 +89,6 @@ public class GamePlay extends JPanel implements DEFAULTS{
         if(ball.getBall().getMaxY() >= BOARD_HEIGHT){
             try {
                 GameSounds.GAME_OVER_sound(YOU_LOSE_SOUND);
-                // TODO: DISPLAY RETURN TO MENNU BUTTON
             } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -166,10 +174,6 @@ public class GamePlay extends JPanel implements DEFAULTS{
 
         Graphics2D g2 = (Graphics2D) g;
         
-        // g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        // g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
-        // g2.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_SPEED);
-        
         if(Running){
             drawComponents(g2);
         }else{
@@ -206,20 +210,18 @@ public class GamePlay extends JPanel implements DEFAULTS{
 
         // Update score
         g2.setColor(TEXT_COLOR);
-        g2.setFont(new Font("Serif", Font.BOLD, 30));
+        g2.setFont(new Font(TEXT_FONT, Font.BOLD, 30));
         FontMetrics fm = g2.getFontMetrics(g2.getFont());
         g2.drawString(Integer.toString(Score), BOARD_WIDTH - BRICK_WIDTH, fm.getAscent());
     }
 
     private void GameOver(Graphics2D g2){
-        Font font = new Font("Verdana", Font.BOLD, 30);
+        Font font = new Font(TEXT_FONT, Font.BOLD, 30);
         FontMetrics fontMetrics = this.getFontMetrics(font);
 
         g2.setColor(Color.BLACK);
         g2.setFont(font);
         g2.drawString(message,
-                (DEFAULTS.BOARD_WIDTH - fontMetrics.stringWidth(message)) / 2, BOARD_HEIGHT / 2);
-        
-        menu.ReturnToMenu(new JFrame());
+                (BOARD_WIDTH - fontMetrics.stringWidth(message)) / 2, BOARD_HEIGHT / 2);
     }
 }

@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 
 public class Menu extends JFrame implements DEFAULTS {
     private static JPanel Components = new JPanel();
+    private BrickBreaker BB;
 
     Menu(){
         // Set up layouts for panel and frame
@@ -76,43 +77,21 @@ public class Menu extends JFrame implements DEFAULTS {
 
         return Title;
     }
-    public void ReturnToMenu(JFrame currFrame){
-        JButton MenuReturn = new JButton("Return to Menu?");
-        MenuReturn.addActionListener(Return);
-        MenuReturn.setMaximumSize(new Dimension(BOARD_WIDTH/2, MenuReturn.getMinimumSize().height));
-        MenuReturn.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JButton Exit = new JButton("Exit");
-        Exit.addActionListener(End);
-        Exit.setMaximumSize(new Dimension(BOARD_WIDTH/2, Exit.getMinimumSize().height));
-        Exit.setAlignmentX(Component.CENTER_ALIGNMENT);
-        
-        currFrame.add(MenuReturn);
-        currFrame.add(Exit);
-    }
+   
 
     ActionListener PlayGame = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e){
+            if(BB != null){
+                // Remove old frame if user decides to play again
+                BB.setVisible(false);
+                BB.dispose();
+            }
             // Display dialog box for user to select difficulty level
             int UserChoice = JOptionPane.showOptionDialog(null, "Please select which difficulty to play on:", "Difficulty",JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
             Menu.this.setVisible(false);
-            BrickBreaker bb = new BrickBreaker(Difficulty.valueOf(options[UserChoice]));
-            bb.setVisible(true);
-        }
-    };
-    ActionListener Return = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e){
-            // Return to menu and leave current frame
-            Menu.this.setVisible(true);
-        }
-    };
-    ActionListener End = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e){
-            // Display dialog box for user to select difficulty level
-            System.exit(0);
+            BB = new BrickBreaker(Difficulty.valueOf(options[UserChoice]));
+            BB.setVisible(true);
         }
     };
 

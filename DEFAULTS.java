@@ -75,17 +75,23 @@ public interface DEFAULTS {
                   TEXT_FONT = "Roboto";
 
     // Default class for sound caused by interactions of ball and paddle/brick
-    public class Sound{
-        private Clip clip; 
+    public static class Sound{
+        private static Clip clip; 
         private AudioInputStream input;
 
         public void HIT_sound(String sound) throws UnsupportedAudioFileException, IOException, LineUnavailableException{
+            if(clip != null){
+                clip.close();   // Release memory used for clip if already played
+            }
             input = AudioSystem.getAudioInputStream(new File(sound));
             clip = AudioSystem.getClip();
             clip.open(input);
             clip.start();
         }
         public void GAME_OVER_sound(String sound) throws UnsupportedAudioFileException, IOException, LineUnavailableException{
+            if(clip != null){
+                clip.close();   // Release memory used for clip if already played
+            }
             input = AudioSystem.getAudioInputStream(new File(sound));
             clip = AudioSystem.getClip();
             clip.open(input);
