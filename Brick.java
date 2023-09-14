@@ -3,15 +3,21 @@
  * Class for creating and accessing/manipulating the bricks on the board
  * 
  */
-
+/*
+ * 
+ * TODO: Formulate strength and power-ups
+ * 
+ */
 import java.awt.Rectangle;
 import java.util.LinkedList;
 
 public class Brick implements DEFAULTS{
     
-    private Rectangle BrickShape;
+    private static Rectangle BrickShape;
+    // private static int Strength;
     
     Brick(int x, int y){
+        // Strength = 1 + (int)(Math.random() * 3);
         BrickShape = new Rectangle(x, y, BRICK_WIDTH, BRICK_HEIGHT);
     }
 
@@ -29,12 +35,17 @@ public class Brick implements DEFAULTS{
     }
 
     public int getX(){
-        return this.BrickShape.x;
+        return BrickShape.x;
     }
     public int getY(){
-        return this.BrickShape.y;
+        return BrickShape.y;
     }
-
+    // public int getStrength(){
+    //     return Strength;
+    // }
+    // public void setStrength(){
+    //     Strength -= 1;
+    // }
     public Rectangle getRectangle(){
         return BrickShape;
     }
