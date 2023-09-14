@@ -5,20 +5,17 @@
  */
 
 import java.awt.Rectangle;
-import java.util.Set;
+import java.util.LinkedList;
 
 public class Brick implements DEFAULTS{
     
-    private boolean Destroyed;
-    private int x, y;
+    private Rectangle BrickShape;
     
     Brick(int x, int y){
-        this.x = x;
-        this.y = y;
-        //Destroyed = false;  // Represents not being destroyed
+        BrickShape = new Rectangle(x, y, BRICK_WIDTH, BRICK_HEIGHT);
     }
 
-    public static Set<Brick> setBricks(Set<Brick> Bricks, int ROWS, int BRICK_COUNT){
+    public static LinkedList<Brick> setBricks(LinkedList<Brick> Bricks, int ROWS, int BRICK_COUNT){
 
         for(int i = 0; i < BRICK_COUNT; i++){
             // Each brick will be offsetted by a factor based on the Frames height and width at the given time
@@ -31,20 +28,14 @@ public class Brick implements DEFAULTS{
         return Bricks;
     }
 
-    public boolean checkStatus(){
-        return this.Destroyed;
-    }
-    public void setStatus(){
-        this.Destroyed = true;
-    }
     public int getX(){
-        return this.x;
+        return this.BrickShape.x;
     }
     public int getY(){
-        return this.y;
+        return this.BrickShape.y;
     }
 
     public Rectangle getRectangle(){
-        return new Rectangle(x, y, BRICK_WIDTH, BRICK_HEIGHT);
+        return BrickShape;
     }
 }

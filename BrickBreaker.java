@@ -11,6 +11,7 @@ import javax.swing.JFrame;  // Creates window for JPanel to put on and other GUI
 public class BrickBreaker extends JFrame implements DEFAULTS{   // Extension of base class since nothing new is added/changed method wise
     private static int rows, columns;
     private static Menu menu;
+    public static BrickBreaker BB;
 
     BrickBreaker(Difficulty difficulty){
         BrickBreaker.rows = difficulty.getBricks() / COLUMNS;

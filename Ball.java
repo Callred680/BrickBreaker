@@ -12,51 +12,52 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class Ball implements DEFAULTS{
-    private int WIDTH, HEIGHT, xPos, yPos, MoveX, MoveY;
+    private static int WIDTH, HEIGHT, MoveX, MoveY;
     private Difficulty difficulty;
+    private static Rectangle BallShape;    // Ball image with position coordinates built in
 
     // Start ball initially falling at an angle, otherwise it will just bounce vertically
     Ball(Difficulty difficulty){
         this.difficulty = difficulty;
         MoveX = difficulty.getBallSpeed();
         MoveY = -(difficulty.getBallSpeed());
-        this.WIDTH = BALL_WIDTH;
-        this.HEIGHT = BALL_HEIGHT; 
-        xPos = BOARD_WIDTH / 2;
-        yPos = BOARD_HEIGHT / 2;
+        WIDTH = BALL_WIDTH;
+        HEIGHT = BALL_HEIGHT; 
+        BallShape = new Rectangle(BOARD_WIDTH / 2,  BOARD_HEIGHT / 2, WIDTH, HEIGHT);
     }
 
-    public void move(Sound GameSounds) throws UnsupportedAudioFileException, IOException, LineUnavailableException{
+    public void move(Sound Ball_Border_Sound) throws UnsupportedAudioFileException, IOException, LineUnavailableException{
+        // Reset sound if already played
+        Ball_Border_Sound.Rewind_Sound();
+
         // Update position of ball
-        xPos += MoveX;
-        yPos += MoveY;
+        BallShape.x += MoveX;
+        BallShape.y += MoveY;
 
         // Check if paddle exceeds borders
-        if(xPos <= 0 ){
+        if(BallShape.x <= 0 ){
             MoveX = difficulty.getBallSpeed();
-            GameSounds.HIT_sound(BALL_BORDER_SOUND);
-        }
-        if(xPos >= BOARD_WIDTH - WIDTH){
+            Ball_Border_Sound.Play_Sound();
+        }else if(BallShape.x >= BOARD_WIDTH - WIDTH){
             MoveX = -(difficulty.getBallSpeed());
-            GameSounds.HIT_sound(BALL_BORDER_SOUND);
-        }
-        if(yPos <= 0){
+            Ball_Border_Sound.Play_Sound();
+        }else if(BallShape.y <= 0){
             MoveY = difficulty.getBallSpeed();
-            GameSounds.HIT_sound(BALL_BORDER_SOUND);
+            Ball_Border_Sound.Play_Sound();
         }
     }
     
     // Returns ball as object to be drawn
     public Rectangle getBall(){
-        return new Rectangle(xPos, yPos, WIDTH, HEIGHT);
+        return BallShape;
     }
 
     // Returns center of ball for use in collision detection/response
     public int getXPos(){
-        return this.xPos;
+        return BallShape.x;
     }
     public int getYPos(){
-        return this.yPos;
+        return BallShape.y;
     }
     public int getWIDTH(){
         return WIDTH;
@@ -71,10 +72,10 @@ public class Ball implements DEFAULTS{
         return MoveY;
     }
 
-    public void setMoveX(int MoveX){
-        this.MoveX = MoveX;
+    public void setMoveX(int NewMoveX){
+        MoveX = NewMoveX;
     }
-    public void setMoveY(int MoveY){
-        this.MoveY = MoveY;
+    public void setMoveY(int NewMoveY){
+        MoveY = NewMoveY;
     }
 }

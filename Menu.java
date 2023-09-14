@@ -20,7 +20,7 @@ import javax.swing.JPanel;
 
 public class Menu extends JFrame implements DEFAULTS {
     private static JPanel Components;
-    private BrickBreaker BB;
+    // private BrickBreaker BB;
     private LeaderBoard LB;
 
     Menu(){
@@ -85,16 +85,16 @@ public class Menu extends JFrame implements DEFAULTS {
     ActionListener PlayGame = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e){
-            if(BB != null){
+            if(BrickBreaker.BB != null){
                 // Remove old frame if user decides to play again
-                BB.setVisible(false);
-                BB.dispose();
+                BrickBreaker.BB.setVisible(false);
+                BrickBreaker.BB.dispose();
             }
             // Display dialog box for user to select difficulty level
             int UserChoice = JOptionPane.showOptionDialog(null, "Please select which difficulty to play on:", "Difficulty",JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
             Menu.this.setVisible(false);
-            BB = new BrickBreaker(Difficulty.valueOf(options[UserChoice]));
-            BB.setVisible(true);
+            BrickBreaker.BB = new BrickBreaker(Difficulty.valueOf(options[UserChoice]));
+            BrickBreaker.BB.setVisible(true);
         }
     };
 

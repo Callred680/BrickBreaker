@@ -6,37 +6,33 @@
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
-
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
 
 import java.awt.Rectangle;
 
 public class Paddle extends KeyAdapter implements DEFAULTS{
-    private int WIDTH, HEIGHT, xPos, yPos, MoveX;
+    private static int WIDTH, HEIGHT, MoveX;
     private Difficulty difficulty;
+    private static Rectangle PaddleShape;
 
     Paddle(Difficulty difficulty){
         this.difficulty = difficulty;
-        this.WIDTH = PADDLE_WIDTH;  // Width of the paddle
-        this.HEIGHT = PADDLE_HEIGHT; // Height (thickness) of the paddle
-        this.xPos = (BOARD_WIDTH/2) - (PADDLE_WIDTH/2);   // Start position of the paddle
-        this.yPos = BOARD_HEIGHT - PADDLE_HEIGHT;;   // Y position which won't change
+        WIDTH = PADDLE_WIDTH;  // Width of the paddle
+        HEIGHT = PADDLE_HEIGHT; // Height (thickness) of the paddle
         MoveX = 0;   // Amount paddle will move
+        PaddleShape = new Rectangle((BOARD_WIDTH/2) - (PADDLE_WIDTH/2), BOARD_HEIGHT - PADDLE_HEIGHT, WIDTH, HEIGHT);
     }
 
-    public void move(Sound GameSounds) throws UnsupportedAudioFileException, IOException, LineUnavailableException{
+    public void move(){
         // Update position of paddle
-        xPos += MoveX;
+        PaddleShape.x += MoveX;
 
         // Check if paddle exceeds borders
-        if(xPos <= 0 ){
-            xPos = 0;
+        if(PaddleShape.x <= 0 ){
+            PaddleShape.x = 0;
             //GameSounds.HIT_sound(BALL_BORDER_SOUND);
         }
-        if(xPos >= BOARD_WIDTH - WIDTH){
-            xPos = BOARD_WIDTH - WIDTH;
+        if(PaddleShape.x >= BOARD_WIDTH - WIDTH){
+            PaddleShape.x = BOARD_WIDTH - WIDTH;
             //GameSounds.HIT_sound(BALL_BORDER_SOUND);
         }
         
@@ -44,29 +40,29 @@ public class Paddle extends KeyAdapter implements DEFAULTS{
 
     // Returns ball as object to be drawn
     public Rectangle getPaddle(){
-        return new Rectangle(xPos, yPos, WIDTH, HEIGHT);
+        return PaddleShape;
     }
     
     // Return the left and right sides for the paddle
     public int getLeft(){
-        return this.xPos;
+        return PaddleShape.x;
     }
     public int getRight(){
-        return this.xPos + this.WIDTH;
+        return PaddleShape.x + WIDTH;
     }
 
     // Return set width for paddle
     public int getWIDTH(){
-        return this.WIDTH;
+        return WIDTH;
     }
     public int getHEIGHT(){
-        return this.HEIGHT;
+        return HEIGHT;
     }
     public int getXPos(){
-        return this.xPos;
+        return PaddleShape.x;
     }
     public int getYPos(){
-        return this.yPos;
+        return PaddleShape.y;
     }
     public int getMoveX(){
         return MoveX;
