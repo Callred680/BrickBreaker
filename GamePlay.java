@@ -27,7 +27,7 @@ import javax.swing.JPanel;
 public class GamePlay extends JPanel implements DEFAULTS{
     
     // Must be ConcurrentHashMap as objects will be remove and checked concurrently
-    private LinkedList<Brick> Bricks;  // Create set with thread-safe hash map by changing key set once initialized
+    private static LinkedList<Brick> Bricks;  // Create set with thread-safe hash map by changing key set once initialized
 
     // private Brick[] Bricks;
     private static Paddle paddle;
@@ -37,6 +37,7 @@ public class GamePlay extends JPanel implements DEFAULTS{
     private static Sound Ball_Border_Sound, Ball_Brick_Sound, Ball_Paddle_Sound, Win_Sound, Lose_Sound;
     private static Menu menu;
     private static int Score;
+    private long start_time, end_time;  // Measure length of time for completion
     private boolean Running = true;
     private String message = "You won!";
 
@@ -64,6 +65,7 @@ public class GamePlay extends JPanel implements DEFAULTS{
 
         timer = new Timer(15, new Game());
         timer.start();
+        start_time = System.currentTimeMillis(); // Start game timer for user stats
     }
 
     private class Game implements ActionListener{
@@ -108,6 +110,8 @@ public class GamePlay extends JPanel implements DEFAULTS{
             message = "Game Over! You Lost!";
             Running = false;
             timer.stop();
+            end_time = System.currentTimeMillis();  // Get finish time for completion for user stats
+            menu.getUser().AddGame(new GameStats(Score, difficulty, end_time-start_time, false));  // Game lost so set GameStatus to false
         }
 
         // Check if every brick has been destroyed
@@ -118,6 +122,8 @@ public class GamePlay extends JPanel implements DEFAULTS{
             // Stop thread for gameplay/graphics 
             Running = false;
             timer.stop();
+            end_time = System.currentTimeMillis();  // Get finish time for completion for user stats
+            menu.getUser().AddGame(new GameStats(Score, difficulty, end_time-start_time, true));  // Game won so set GameStatus to true
         }
 
         // Check if the ball has collided with the paddle for ball to ricochet approprietly

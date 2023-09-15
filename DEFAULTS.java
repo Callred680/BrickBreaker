@@ -9,7 +9,7 @@ import java.awt.Color;
 
 public interface DEFAULTS {
     // Default difficulties for use in letting user select which one
-    public String[] options = {"EASY","MEDIUM","HARD","IMPOSSIBLE"};
+    final static String[] options = {"EASY","MEDIUM","HARD","IMPOSSIBLE"};
 
     enum Difficulty{
         EASY(36, 2, 1),

@@ -13,7 +13,7 @@ import java.util.LinkedList;
 
 public class Brick implements DEFAULTS{
     
-    private static Rectangle BrickShape;
+    private Rectangle BrickShape;
     // private static int Strength;
     
     Brick(int x, int y){
@@ -25,7 +25,8 @@ public class Brick implements DEFAULTS{
 
         for(int i = 0; i < BRICK_COUNT; i++){
             // Each brick will be offsetted by a factor based on the Frames height and width at the given time
-            Bricks.add(new Brick((BRICK_WIDTH*(i%COLUMNS)) + BRICK_WIDTH, (BRICK_HEIGHT*(i/COLUMNS)) + BRICK_HEIGHT));  // Add brick widht/height for space between bricks and borders
+            Brick newBrick = new Brick((BRICK_WIDTH*(i%COLUMNS)) + BRICK_WIDTH, (BRICK_HEIGHT*(i/COLUMNS)) + BRICK_HEIGHT); // Add brick widht/height for space between bricks and borders
+            Bricks.addFirst(newBrick);  
             /*
              * i%12 = Multiplies the x position by a factor of [0,11]
              * i/12 = Multiplies the y position by a factor of [0,2]

@@ -14,6 +14,11 @@ This program will be a basic version of the brick breaker game built in entirely
     - Sound class within interface contains default sound to be played on hits
         - Custom sound clips can be added
         - Built in library used so only AIFC, AIFF, AU, AND, and WAVE formats accepted
+    - Utilized Freesound.org for sound clips
+- User sign in for game stats and customization storage
+    - Assumes only valid inputs and unique user IDs are inputted
+        - Input verification and error handling TODO
+    - Info and stats stored in XML file
     
 
 ## Features to complete

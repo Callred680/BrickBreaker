@@ -20,8 +20,9 @@ import javax.swing.JPanel;
 
 public class Menu extends JFrame implements DEFAULTS {
     private static JPanel Components;
-    // private BrickBreaker BB;
-    private LeaderBoard LB;
+    private User user;
+    private BrickBreaker BB;
+    private static LeaderBoard LB;
 
     Menu(){
         Components = new JPanel();
@@ -48,6 +49,10 @@ public class Menu extends JFrame implements DEFAULTS {
         setLocationRelativeTo(null);
         setPreferredSize(new Dimension(MENU_WIDTH, MENU_HEIGHT));
         pack();
+    }
+
+    public User getUser(){
+        return this.user;
     }
 
     private JButton Play_Button(){
@@ -85,41 +90,47 @@ public class Menu extends JFrame implements DEFAULTS {
     ActionListener PlayGame = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e){
-            if(BrickBreaker.BB != null){
+            if(BB != null){
                 // Remove old frame if user decides to play again
-                BrickBreaker.BB.setVisible(false);
-                BrickBreaker.BB.dispose();
+                BB.setVisible(false);
+                BB.dispose();
             }
             // Display dialog box for user to select difficulty level
             int UserChoice = JOptionPane.showOptionDialog(null, "Please select which difficulty to play on:", "Difficulty",JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-            Menu.this.setVisible(false);
-            BrickBreaker.BB = new BrickBreaker(Difficulty.valueOf(options[UserChoice]));
-            BrickBreaker.BB.setVisible(true);
+            // -1 is returned if user exits out of the dialog box instead of selecting displayed option
+            if(UserChoice != -1){
+                Menu.this.setVisible(false);
+                BB = new BrickBreaker(Difficulty.valueOf(options[UserChoice]));
+                BB.setVisible(true);                
+            }
         }
     };
 
-    /*
-     * 
-     * LEADER BOARDS AND USER INFORMATION TBD, DISPLAY ERROR MESSAGE IF OPTION IS CLICKED
-     * 
-     */
     ActionListener UserInfo = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e){
-            JOptionPane.showMessageDialog(null, "Sorry, this feature as not be implemented as of right now. It is still currently being developed. Thanks for your understanding!", "FEATURE NOT IMPLEMENTED YET", JOptionPane.ERROR_MESSAGE);
+            user = new User();  // Create new user
+            /*
+             * TODO: Allow user log in first
+             */
         }
     };
     ActionListener SeeScores = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e){
-            if(LB != null){
-                // Remove old frame if user decides to play again
-                LB.setVisible(false);
-                LB.dispose();
+            // Check if user has been assigned first before trying to display leaderboards
+            if(user == null){
+                JOptionPane.showMessageDialog(null, "Error! No user information to be displayed. Please sign in first", "User missing", JOptionPane.WARNING_MESSAGE, null);
+            }else{
+                if(LB != null){
+                    // Remove old frame if user decides to play again
+                    LB.setVisible(false);
+                    LB.dispose();
+                }
+                // Display dialog box for user to select difficulty level
+                LB = new LeaderBoard(user); // Send specific user to obtain specific leaderboard stats
+                LB.setVisible(true);            
             }
-            // Display dialog box for user to select difficulty level
-            LB = new LeaderBoard();
-            LB.setVisible(true);
         }
     };
 }
